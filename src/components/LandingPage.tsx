@@ -317,7 +317,7 @@ const LandingPage = ({ onGetStarted }: LandingPageProps) => {
           </div>
           
           <div className="border-t border-border/40 mt-8 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2024 Promptt. All rights reserved.</p>
+            <p>&copy; 2025 Promptt. All rights reserved.</p>
           </div>
         </div>
       </footer>

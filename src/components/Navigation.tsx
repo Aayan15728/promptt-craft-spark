@@ -1,13 +1,13 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { LogOut, Zap } from 'lucide-react';
+import { LogOut, Zap, BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface NavigationProps {
   userEmail: string;
-  currentView: 'generator' | 'history';
-  setCurrentView: (view: 'generator' | 'history') => void;
+  currentView: 'generator' | 'history' | 'blog';
+  setCurrentView: (view: 'generator' | 'history' | 'blog') => void;
 }
 
 const Navigation = ({ userEmail, currentView, setCurrentView }: NavigationProps) => {
@@ -51,6 +51,14 @@ const Navigation = ({ userEmail, currentView, setCurrentView }: NavigationProps)
                 className={currentView === 'history' ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700' : ''}
               >
                 History
+              </Button>
+              <Button
+                variant={currentView === 'blog' ? 'default' : 'ghost'}
+                onClick={() => setCurrentView('blog')}
+                className={currentView === 'blog' ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700' : ''}
+              >
+                <BookOpen className="h-4 w-4 mr-1" />
+                Blog
               </Button>
             </div>
           </div>

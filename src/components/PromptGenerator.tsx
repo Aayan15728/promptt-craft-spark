@@ -11,12 +11,22 @@ import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 
 interface PromptGeneratorProps {
-  user: User;
+  user: User | null;
   apiKey: string;
   setApiKey: (key: string) => void;
+  freeUsesLeft?: number;
+  onUseFreeTrial?: () => void;
+  onAuthRequired?: () => void;
 }
 
-const PromptGenerator = ({ user, apiKey, setApiKey }: PromptGeneratorProps) => {
+const PromptGenerator: React.FC<PromptGeneratorProps> = ({ 
+  user, 
+  apiKey, 
+  setApiKey, 
+  freeUsesLeft = 0, 
+  onUseFreeTrial, 
+  onAuthRequired 
+}) => {
   const [goal, setGoal] = useState('');
   const [category, setCategory] = useState('');
   const [generatedPrompt, setGeneratedPrompt] = useState('');
@@ -33,6 +43,13 @@ const PromptGenerator = ({ user, apiKey, setApiKey }: PromptGeneratorProps) => {
       return;
     }
 
+    // Check if user needs to authenticate
+    if (!user && freeUsesLeft <= 0) {
+      if (onAuthRequired) {
+        onAuthRequired();
+        return;
+      }
+    }
 
     setLoading(true);
 
@@ -51,12 +68,21 @@ const PromptGenerator = ({ user, apiKey, setApiKey }: PromptGeneratorProps) => {
 
       setGeneratedPrompt(data.generatedPrompt);
       
-      // Save to database
-      await savePrompt(data.generatedPrompt);
+      // Use free trial if not authenticated
+      if (!user && onUseFreeTrial) {
+        onUseFreeTrial();
+      }
+      
+      // Save to database only if user is authenticated
+      if (user) {
+        await savePrompt(data.generatedPrompt);
+      }
       
       toast({
         title: "Success",
-        description: "Prompt generated successfully!"
+        description: user 
+          ? "Prompt generated successfully!" 
+          : `Prompt generated! Free uses remaining: ${freeUsesLeft - 1}. Sign up to save your prompts!`
       });
     } catch (error) {
       console.error('Error generating prompt:', error);
@@ -71,6 +97,8 @@ const PromptGenerator = ({ user, apiKey, setApiKey }: PromptGeneratorProps) => {
   };
 
   const savePrompt = async (prompt: string) => {
+    if (!user) return;
+    
     try {
       const { error } = await supabase
         .from('prompts')
@@ -157,7 +185,8 @@ const PromptGenerator = ({ user, apiKey, setApiKey }: PromptGeneratorProps) => {
               className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Generate Prompt
+              {!user && freeUsesLeft <= 0 ? 'Sign Up to Continue' : 'Generate Prompt'}
+              {!user && freeUsesLeft > 0 && ` (${freeUsesLeft} free left)`}
             </Button>
           </CardContent>
         </div>

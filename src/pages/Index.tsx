@@ -6,14 +6,16 @@ import Navigation from '@/components/Navigation';
 import PromptGenerator from '@/components/PromptGenerator';
 import PromptHistory from '@/components/PromptHistory';
 import LandingPage from '@/components/LandingPage';
+import BlogSection from '@/components/BlogSection';
 
 const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentView, setCurrentView] = useState<'generator' | 'history'>('generator');
+  const [currentView, setCurrentView] = useState<'generator' | 'history' | 'blog'>('generator');
   const [apiKey, setApiKey] = useState('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');
   const [showAuth, setShowAuth] = useState(false);
+  const [freeUsesLeft, setFreeUsesLeft] = useState(3);
 
   useEffect(() => {
     // Set up auth state listener
@@ -66,9 +68,16 @@ const Index = () => {
             user={user} 
             apiKey={apiKey}
             setApiKey={setApiKey}
+            freeUsesLeft={freeUsesLeft}
+            onUseFreeTrial={() => setFreeUsesLeft(prev => Math.max(0, prev - 1))}
+            onAuthRequired={() => setShowAuth(true)}
           />
-        ) : (
+        ) : currentView === 'history' ? (
           <PromptHistory user={user} />
+        ) : currentView === 'blog' ? (
+          <BlogSection />
+        ) : (
+          <LandingPage onGetStarted={() => setShowAuth(true)} />
         )}
       </div>
     </div>
