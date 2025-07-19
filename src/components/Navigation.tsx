@@ -27,24 +27,28 @@ const Navigation = ({ userEmail, currentView, setCurrentView }: NavigationProps)
   };
 
   return (
-    <nav className="border-b bg-background">
+    <nav className="border-b border-border/40 backdrop-blur-sm bg-background/80 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
-              <Zap className="h-6 w-6 text-primary" />
-              <h1 className="text-2xl font-bold">promptt</h1>
+              <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600">
+                <Zap className="h-6 w-6 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold gradient-text">promptt</h1>
             </div>
             <div className="flex gap-2">
               <Button
                 variant={currentView === 'generator' ? 'default' : 'ghost'}
                 onClick={() => setCurrentView('generator')}
+                className={currentView === 'generator' ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700' : ''}
               >
                 Generator
               </Button>
               <Button
                 variant={currentView === 'history' ? 'default' : 'ghost'}
                 onClick={() => setCurrentView('history')}
+                className={currentView === 'history' ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700' : ''}
               >
                 History
               </Button>

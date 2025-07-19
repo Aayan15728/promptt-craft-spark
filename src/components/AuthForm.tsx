@@ -78,12 +78,18 @@ const AuthForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">promptt</CardTitle>
-          <CardDescription>Sign in to generate AI prompts</CardDescription>
-        </CardHeader>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
+      <Card className="w-full max-w-md gradient-border">
+        <div>
+          <CardHeader className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600">
+                <span className="text-white font-bold">P</span>
+              </div>
+              <CardTitle className="text-2xl font-bold gradient-text">promptt</CardTitle>
+            </div>
+            <CardDescription>Sign in to generate AI prompts</CardDescription>
+          </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
@@ -113,7 +119,7 @@ const AuthForm = () => {
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700" disabled={loading}>
                   {loading ? 'Signing in...' : 'Sign In'}
                 </Button>
               </form>
@@ -142,13 +148,14 @@ const AuthForm = () => {
                     minLength={6}
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700" disabled={loading}>
                   {loading ? 'Signing up...' : 'Sign Up'}
                 </Button>
               </form>
             </TabsContent>
           </Tabs>
         </CardContent>
+        </div>
       </Card>
     </div>
   );

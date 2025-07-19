@@ -33,38 +33,20 @@ const PromptGenerator = ({ user, apiKey, setApiKey }: PromptGeneratorProps) => {
       return;
     }
 
-    if (!apiKey.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter your OpenAI API key",
-        variant: "destructive"
-      });
-      return;
-    }
 
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `https://ospavdbdzcalcttqxuvi.supabase.co/functions/v1/generate-prompt`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${await supabase.auth.getSession().then(({ data }) => data.session?.access_token)}`,
-          },
-          body: JSON.stringify({
-            goal,
-            category: category || undefined,
-            apiKey
-          }),
-        }
-      );
+      const { data } = await supabase.functions.invoke('generate-prompt', {
+        body: {
+          goal,
+          category: category || undefined,
+          apiKey
+        },
+      });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate prompt');
+      if (data.error) {
+        throw new Error(data.error);
       }
 
       setGeneratedPrompt(data.generatedPrompt);
@@ -131,75 +113,54 @@ const PromptGenerator = ({ user, apiKey, setApiKey }: PromptGeneratorProps) => {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>API Key Configuration</CardTitle>
-          <CardDescription>
-            Enter your OpenAI API key to generate prompts
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <Label htmlFor="api-key">OpenAI API Key</Label>
-            <Input
-              id="api-key"
-              type="password"
-              placeholder="sk-..."
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-            />
-            <p className="text-sm text-muted-foreground">
-              Your API key is stored securely and never saved on our servers
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <Card className="gradient-border">
+        <div>
+          <CardHeader>
+            <CardTitle className="gradient-text">Generate AI Prompt</CardTitle>
+            <CardDescription>
+              Describe what you want to achieve and we'll create an optimized prompt for you
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="goal">Goal</Label>
+              <Input
+                id="goal"
+                placeholder="e.g., write a tweet about productivity"
+                value={goal}
+                onChange={(e) => setGoal(e.target.value)}
+                className="bg-muted/50"
+              />
+            </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Generate AI Prompt</CardTitle>
-          <CardDescription>
-            Describe what you want to achieve and we'll create an optimized prompt for you
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="goal">Goal</Label>
-            <Input
-              id="goal"
-              placeholder="e.g., write a tweet about productivity"
-              value={goal}
-              onChange={(e) => setGoal(e.target.value)}
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="category">Category (Optional)</Label>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="bg-muted/50">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No category</SelectItem>
+                  <SelectItem value="writing">Writing</SelectItem>
+                  <SelectItem value="marketing">Marketing</SelectItem>
+                  <SelectItem value="coding">Coding</SelectItem>
+                  <SelectItem value="analysis">Analysis</SelectItem>
+                  <SelectItem value="creative">Creative</SelectItem>
+                  <SelectItem value="business">Business</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="category">Category (Optional)</Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">No category</SelectItem>
-                <SelectItem value="writing">Writing</SelectItem>
-                <SelectItem value="marketing">Marketing</SelectItem>
-                <SelectItem value="coding">Coding</SelectItem>
-                <SelectItem value="analysis">Analysis</SelectItem>
-                <SelectItem value="creative">Creative</SelectItem>
-                <SelectItem value="business">Business</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Button 
-            onClick={handleGenerate} 
-            disabled={loading || !goal.trim() || !apiKey.trim()}
-            className="w-full"
-          >
-            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Generate Prompt
-          </Button>
-        </CardContent>
+            <Button 
+              onClick={handleGenerate} 
+              disabled={loading || !goal.trim()}
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+            >
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Generate Prompt
+            </Button>
+          </CardContent>
+        </div>
       </Card>
 
       {generatedPrompt && (
