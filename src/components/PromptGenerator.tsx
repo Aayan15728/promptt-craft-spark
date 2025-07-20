@@ -168,7 +168,6 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No category</SelectItem>
                   <SelectItem value="writing">Writing</SelectItem>
                   <SelectItem value="marketing">Marketing</SelectItem>
                   <SelectItem value="coding">Coding</SelectItem>
