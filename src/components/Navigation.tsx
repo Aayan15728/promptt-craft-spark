@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { LogOut, Zap, BookOpen } from 'lucide-react';
+import { LogOut, Zap, BookOpen, Crown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -69,6 +69,14 @@ const Navigation = ({ userEmail, currentView, setCurrentView, dailyUsesLeft }: N
                 {dailyUsesLeft} prompts left today
               </span>
             )}
+            <Button 
+              size="sm" 
+              onClick={() => setCurrentView('pricing')}
+              className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white"
+            >
+              <Crown className="h-3 w-3 mr-1" />
+              Upgrade
+            </Button>
             <div className="relative">
               <button 
                 onClick={() => setCurrentView('profile')}
