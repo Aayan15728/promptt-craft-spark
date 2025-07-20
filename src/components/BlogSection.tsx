@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, User, ArrowRight } from 'lucide-react';
@@ -6,33 +7,36 @@ import { Calendar, User, ArrowRight } from 'lucide-react';
 const blogPosts = [
   {
     id: 1,
-    title: "10 Advanced Prompt Engineering Techniques That Actually Work",
+    title: "The Ultimate Guide to AI Prompt Engineering",
     description: "Discover professional-grade techniques for crafting AI prompts that deliver consistent, high-quality results.",
     category: "Techniques",
     author: "Sarah Johnson",
     date: "Jan 15, 2025",
     readTime: "5 min read",
-    tags: ["AI", "Prompt Engineering", "Tips"]
+    tags: ["AI", "Prompt Engineering", "Tips"],
+    slug: "ai-prompt-engineering-guide"
   },
   {
     id: 2,
-    title: "ChatGPT vs Claude vs Gemini: Which AI Works Best for Different Prompts?",
+    title: "ChatGPT vs Claude: A Comprehensive Comparison",
     description: "A comprehensive comparison of leading AI models and how to optimize prompts for each platform.",
     category: "Comparison",
     author: "Mike Chen",
     date: "Jan 12, 2025",
     readTime: "8 min read",
-    tags: ["AI Models", "Comparison", "OpenAI"]
+    tags: ["AI Models", "Comparison", "OpenAI"],
+    slug: "chatgpt-vs-claude-comparison"
   },
   {
     id: 3,
-    title: "The Psychology Behind Effective AI Prompts",
+    title: "The Future of AI in Content Creation",
     description: "Understanding how AI models interpret language and how to structure prompts for better responses.",
     category: "Psychology",
     author: "Dr. Emily Rodriguez",
     date: "Jan 10, 2025",
     readTime: "6 min read",
-    tags: ["Psychology", "AI Behavior", "Research"]
+    tags: ["Psychology", "AI Behavior", "Research"],
+    slug: "future-of-ai-content-creation"
   },
   {
     id: 4,
@@ -138,48 +142,54 @@ const BlogSection = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {blogPosts.map((post) => (
-          <Card key={post.id} className="hover:shadow-lg transition-shadow cursor-pointer group">
-            <CardHeader>
-              <div className="flex items-center justify-between mb-2">
-                <Badge variant="secondary">{post.category}</Badge>
-                <span className="text-xs text-muted-foreground">{post.readTime}</span>
-              </div>
-              <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                {post.title}
-              </CardTitle>
-              <CardDescription className="line-clamp-3">
-                {post.description}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1">
-                    <User className="h-3 w-3" />
-                    <span>{post.author}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    <span>{post.date}</span>
-                  </div>
+          <Link key={post.id} to={`/blog/${post.slug}`}>
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer group h-full">
+              <CardHeader>
+                <div className="flex items-center justify-between mb-2">
+                  <Badge variant="secondary">{post.category}</Badge>
+                  <span className="text-xs text-muted-foreground">{post.readTime}</span>
                 </div>
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-              <div className="flex flex-wrap gap-1 mt-3">
-                {post.tags.map((tag) => (
-                  <Badge key={tag} variant="outline" className="text-xs">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                  {post.title}
+                </CardTitle>
+                <CardDescription className="line-clamp-3">
+                  {post.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
+                      <User className="h-3 w-3" />
+                      <span>{post.author}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      <span>{post.date}</span>
+                    </div>
+                  </div>
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+                <div className="flex flex-wrap gap-1 mt-3">
+                  {post.tags.map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
 
-      {/* AdSense placeholder */}
-      <div className="ad-container">
-        <p className="text-muted-foreground">Advertisement Space</p>
+      {/* Ad Slots */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-2 border-dashed border-blue-200 dark:border-blue-800 rounded-lg p-8 text-center">
+        <div className="text-muted-foreground text-sm mb-2">Advertisement</div>
+        <div className="bg-white/80 dark:bg-gray-900/80 rounded p-4 border">
+          <div className="text-lg font-medium text-muted-foreground">Ad Space - Blog Section</div>
+          <div className="text-sm text-muted-foreground mt-1">970x250 Leaderboard</div>
+        </div>
       </div>
     </div>
   );

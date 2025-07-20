@@ -13,10 +13,13 @@ serve(async (req) => {
 
   try {
     const { goal, category, apiKey } = await req.json();
+    
+    // Get API key from environment or use provided one
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY') || apiKey;
 
-    if (!apiKey) {
+    if (!openAIApiKey) {
       return new Response(
-        JSON.stringify({ error: 'API key is required' }),
+        JSON.stringify({ error: 'OpenAI API key is required. Please provide your API key or configure it in the environment.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -26,7 +29,7 @@ serve(async (req) => {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
