@@ -7,7 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 
-const AuthForm = () => {
+interface AuthFormProps {
+  onBack?: () => void;
+}
+
+const AuthForm = ({ onBack }: AuthFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -121,11 +125,18 @@ const AuthForm = () => {
       <Card className="w-full max-w-md gradient-border">
         <div>
           <CardHeader className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600">
-                <span className="text-white font-bold">P</span>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600">
+                  <span className="text-white font-bold">P</span>
+                </div>
+                <CardTitle className="text-2xl font-bold gradient-text">promptt</CardTitle>
               </div>
-              <CardTitle className="text-2xl font-bold gradient-text">promptt</CardTitle>
+              {onBack && (
+                <button onClick={onBack} className="text-muted-foreground hover:text-foreground transition-colors">
+                  ← Back
+                </button>
+              )}
             </div>
             <CardDescription>Sign in to generate AI prompts</CardDescription>
           </CardHeader>

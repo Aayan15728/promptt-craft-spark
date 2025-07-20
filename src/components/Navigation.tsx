@@ -6,11 +6,12 @@ import { useToast } from '@/hooks/use-toast';
 
 interface NavigationProps {
   userEmail: string;
-  currentView: 'generator' | 'history' | 'blog';
-  setCurrentView: (view: 'generator' | 'history' | 'blog') => void;
+  currentView: 'generator' | 'history' | 'blog' | 'profile' | 'pricing' | 'not-available';
+  setCurrentView: (view: 'generator' | 'history' | 'blog' | 'profile' | 'pricing' | 'not-available') => void;
+  dailyUsesLeft?: number;
 }
 
-const Navigation = ({ userEmail, currentView, setCurrentView }: NavigationProps) => {
+const Navigation = ({ userEmail, currentView, setCurrentView, dailyUsesLeft }: NavigationProps) => {
   const { toast } = useToast();
 
   const handleSignOut = async () => {
@@ -63,7 +64,22 @@ const Navigation = ({ userEmail, currentView, setCurrentView }: NavigationProps)
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{userEmail}</span>
+            {dailyUsesLeft !== undefined && (
+              <span className="text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
+                {dailyUsesLeft} prompts left today
+              </span>
+            )}
+            <div className="relative">
+              <button 
+                onClick={() => setCurrentView('profile')}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors bg-muted/50 px-3 py-2 rounded-lg"
+              >
+                <div className="p-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-600">
+                  <span className="text-white text-xs font-bold">{userEmail[0].toUpperCase()}</span>
+                </div>
+                {userEmail.split('@')[0]}
+              </button>
+            </div>
             <Button variant="outline" size="sm" onClick={handleSignOut}>
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out

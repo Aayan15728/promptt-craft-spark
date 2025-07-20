@@ -19,9 +19,11 @@ import {
 
 interface LandingPageProps {
   onGetStarted: () => void;
+  onViewBlog?: () => void;
+  onViewPricing?: () => void;
 }
 
-const LandingPage = ({ onGetStarted }: LandingPageProps) => {
+const LandingPage = ({ onGetStarted, onViewBlog, onViewPricing }: LandingPageProps) => {
   const features = [
     {
       icon: Zap,
@@ -159,8 +161,8 @@ const LandingPage = ({ onGetStarted }: LandingPageProps) => {
                 Start Generating
                 <Sparkles className="ml-2 h-5 w-5" />
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6">
-                Watch Demo
+              <Button variant="outline" size="lg" className="text-lg px-8 py-6" onClick={onGetStarted}>
+                Try Demo
               </Button>
             </div>
             

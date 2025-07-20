@@ -14,18 +14,18 @@ interface PromptGeneratorProps {
   user: User | null;
   apiKey: string;
   setApiKey: (key: string) => void;
-  freeUsesLeft?: number;
-  onUseFreeTrial?: () => void;
-  onAuthRequired?: () => void;
+  dailyUsesLeft?: number;
+  onUseDailyLimit?: () => void;
+  onUpgradeRequired?: () => void;
 }
 
 const PromptGenerator: React.FC<PromptGeneratorProps> = ({ 
   user, 
   apiKey, 
   setApiKey, 
-  freeUsesLeft = 0, 
-  onUseFreeTrial, 
-  onAuthRequired 
+  dailyUsesLeft = 5, 
+  onUseDailyLimit, 
+  onUpgradeRequired 
 }) => {
   const [goal, setGoal] = useState('');
   const [category, setCategory] = useState('');
@@ -43,10 +43,10 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
       return;
     }
 
-    // Check if user needs to authenticate
-    if (!user && freeUsesLeft <= 0) {
-      if (onAuthRequired) {
-        onAuthRequired();
+    // Check if user has daily uses left
+    if (user && dailyUsesLeft <= 0) {
+      if (onUpgradeRequired) {
+        onUpgradeRequired();
         return;
       }
     }
@@ -68,12 +68,12 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
 
       setGeneratedPrompt(data.generatedPrompt);
       
-      // Use free trial if not authenticated
-      if (!user && onUseFreeTrial) {
-        onUseFreeTrial();
+      // Use daily limit if authenticated
+      if (user && onUseDailyLimit) {
+        onUseDailyLimit();
       }
       
-      // Save to database only if user is authenticated
+      // Save to database if user is authenticated
       if (user) {
         await savePrompt(data.generatedPrompt);
       }
@@ -81,8 +81,8 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
       toast({
         title: "Success",
         description: user 
-          ? "Prompt generated successfully!" 
-          : `Prompt generated! Free uses remaining: ${freeUsesLeft - 1}. Sign up to save your prompts!`
+          ? `Prompt generated successfully! ${dailyUsesLeft - 1} prompts remaining today.` 
+          : "Prompt generated! Sign up to save your prompts and get more daily uses!"
       });
     } catch (error) {
       console.error('Error generating prompt:', error);
@@ -181,12 +181,12 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
 
             <Button 
               onClick={handleGenerate} 
-              disabled={loading || !goal.trim()}
+              disabled={loading || !goal.trim() || (user && dailyUsesLeft <= 0)}
               className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {!user && freeUsesLeft <= 0 ? 'Sign Up to Continue' : 'Generate Prompt'}
-              {!user && freeUsesLeft > 0 && ` (${freeUsesLeft} free left)`}
+              {user && dailyUsesLeft <= 0 ? 'Upgrade for More Prompts' : 'Generate Prompt'}
+              {user && dailyUsesLeft > 0 && ` (${dailyUsesLeft} left today)`}
             </Button>
           </CardContent>
         </div>
