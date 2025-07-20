@@ -54,7 +54,9 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
     setLoading(true);
 
     try {
-      const { data } = await supabase.functions.invoke('generate-prompt', {
+      console.log('Calling generate-prompt function with:', { goal, category, apiKey: apiKey ? 'provided' : 'missing' });
+      
+      const { data, error } = await supabase.functions.invoke('generate-prompt', {
         body: {
           goal,
           category: category || undefined,
@@ -62,8 +64,21 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
         },
       });
 
-      if (data.error) {
+      console.log('Function response:', { data, error });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(error.message || 'Failed to call prompt generation function');
+      }
+
+      if (data?.error) {
+        console.error('API error:', data.error);
         throw new Error(data.error);
+      }
+
+      if (!data?.generatedPrompt) {
+        console.error('No prompt in response:', data);
+        throw new Error('No prompt was generated. Please try again.');
       }
 
       setGeneratedPrompt(data.generatedPrompt);
@@ -86,9 +101,10 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
       });
     } catch (error) {
       console.error('Error generating prompt:', error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to generate prompt. Please check your API key and try again.";
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to generate prompt",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -194,12 +210,22 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
                       <SelectValue placeholder="Choose a category to enhance your prompt" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="writing">✍️ Writing & Content</SelectItem>
-                      <SelectItem value="marketing">📈 Marketing & Sales</SelectItem>
-                      <SelectItem value="coding">💻 Programming & Code</SelectItem>
-                      <SelectItem value="analysis">📊 Analysis & Research</SelectItem>
+                      <SelectItem value="writing">✍️ Writing & Content Creation</SelectItem>
+                      <SelectItem value="marketing">📈 Marketing & Advertising</SelectItem>
+                      <SelectItem value="coding">💻 Programming & Development</SelectItem>
+                      <SelectItem value="analysis">📊 Data Analysis & Research</SelectItem>
                       <SelectItem value="creative">🎨 Creative & Design</SelectItem>
                       <SelectItem value="business">💼 Business & Strategy</SelectItem>
+                      <SelectItem value="education">🎓 Education & Training</SelectItem>
+                      <SelectItem value="social">📱 Social Media & Content</SelectItem>
+                      <SelectItem value="finance">💰 Finance & Investment</SelectItem>
+                      <SelectItem value="health">🏥 Healthcare & Wellness</SelectItem>
+                      <SelectItem value="travel">✈️ Travel & Tourism</SelectItem>
+                      <SelectItem value="entertainment">🎬 Entertainment & Media</SelectItem>
+                      <SelectItem value="technology">⚡ Technology & Innovation</SelectItem>
+                      <SelectItem value="science">🧪 Science & Research</SelectItem>
+                      <SelectItem value="legal">⚖️ Legal & Compliance</SelectItem>
+                      <SelectItem value="sales">🎯 Sales & Customer Relations</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

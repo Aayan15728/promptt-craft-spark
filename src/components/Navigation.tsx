@@ -64,11 +64,6 @@ const Navigation = ({ userEmail, currentView, setCurrentView, dailyUsesLeft }: N
             </div>
           </div>
           <div className="flex items-center gap-4">
-            {dailyUsesLeft !== undefined && (
-              <span className="text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
-                {dailyUsesLeft} prompts left today
-              </span>
-            )}
             <Button 
               size="sm" 
               onClick={() => setCurrentView('pricing')}
