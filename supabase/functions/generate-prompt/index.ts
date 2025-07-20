@@ -19,21 +19,23 @@ serve(async (req) => {
 
     if (!openAIApiKey) {
       return new Response(
-        JSON.stringify({ error: 'OpenAI API key is required. Please provide your API key or configure it in the environment.' }),
+        JSON.stringify({ error: 'OpenRouter API key is required. Please provide your OpenRouter API key or configure it in the environment.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     const prompt = createSystemPrompt(goal, category);
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://promptt.ai',
+        'X-Title': 'Promptt AI Generator'
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'openai/gpt-4o-mini',
         messages: [
           {
             role: 'system',
