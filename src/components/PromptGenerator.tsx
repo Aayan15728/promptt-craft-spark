@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -12,8 +11,6 @@ import { User } from '@supabase/supabase-js';
 
 interface PromptGeneratorProps {
   user: User | null;
-  apiKey: string;
-  setApiKey: (key: string) => void;
   dailyUsesLeft?: number;
   onUseDailyLimit?: () => void;
   onUpgradeRequired?: () => void;
@@ -21,8 +18,6 @@ interface PromptGeneratorProps {
 
 const PromptGenerator: React.FC<PromptGeneratorProps> = ({ 
   user, 
-  apiKey, 
-  setApiKey, 
   dailyUsesLeft = 5, 
   onUseDailyLimit, 
   onUpgradeRequired 
@@ -54,30 +49,22 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
     setLoading(true);
 
     try {
-      console.log('Calling generate-prompt function with:', { goal, category, apiKey: apiKey ? 'provided' : 'missing' });
-      
       const { data, error } = await supabase.functions.invoke('generate-prompt', {
         body: {
           goal,
           category: category || undefined,
-          apiKey
         },
       });
 
-      console.log('Function response:', { data, error });
-
       if (error) {
-        console.error('Supabase function error:', error);
         throw new Error(error.message || 'Failed to call prompt generation function');
       }
 
       if (data?.error) {
-        console.error('API error:', data.error);
         throw new Error(data.error);
       }
 
       if (!data?.generatedPrompt) {
-        console.error('No prompt in response:', data);
         throw new Error('No prompt was generated. Please try again.');
       }
 
@@ -101,7 +88,7 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
       });
     } catch (error) {
       console.error('Error generating prompt:', error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to generate prompt. Please check your API key and try again.";
+      const errorMessage = error instanceof Error ? error.message : "Failed to generate prompt. Please try again.";
       toast({
         title: "Error",
         description: errorMessage,

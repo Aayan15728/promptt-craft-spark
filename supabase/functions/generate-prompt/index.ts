@@ -12,15 +12,15 @@ serve(async (req) => {
   }
 
   try {
-    const { goal, category, apiKey } = await req.json();
+    const { goal, category } = await req.json();
     
-    // Get API key from environment or use provided one
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY') || apiKey;
+    // Get API key from environment
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
     if (!openAIApiKey) {
       return new Response(
-        JSON.stringify({ error: 'OpenRouter API key is required. Please provide your OpenRouter API key or configure it in the environment.' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'The service is not configured correctly. Please contact support.' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 

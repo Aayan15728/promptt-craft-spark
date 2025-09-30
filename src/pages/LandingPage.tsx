@@ -16,14 +16,9 @@ import {
   TrendingUp,
   Globe
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-interface LandingPageProps {
-  onGetStarted: () => void;
-  onViewBlog?: () => void;
-  onViewPricing?: () => void;
-}
-
-const LandingPage = ({ onGetStarted, onViewBlog, onViewPricing }: LandingPageProps) => {
+const LandingPage = () => {
   const features = [
     {
       icon: Zap,
@@ -52,96 +47,27 @@ const LandingPage = ({ onGetStarted, onViewBlog, onViewPricing }: LandingPagePro
       title: "The Ultimate Guide to AI Prompt Engineering",
       description: "Master the art of crafting effective prompts for better AI responses.",
       category: "Guide",
-      readTime: "5 min read"
+      readTime: "5 min read",
+      slug: "ultimate-guide-to-ai-prompt-engineering"
     },
     {
       title: "10 Advanced Prompt Techniques That Actually Work",
       description: "Proven strategies to get better results from ChatGPT and other AI models.",
       category: "Tips",
-      readTime: "7 min read"
+      readTime: "7 min read",
+      slug: "10-advanced-prompt-techniques"
     },
     {
       title: "How to Write Prompts for Creative Writing",
       description: "Unlock your creativity with these specialized prompting techniques.",
       category: "Creative",
-      readTime: "4 min read"
+      readTime: "4 min read",
+      slug: "prompts-for-creative-writing"
     },
-    {
-      title: "Business Use Cases for AI Prompt Generation",
-      description: "Discover how companies are using AI prompts to boost productivity.",
-      category: "Business",
-      readTime: "6 min read"
-    },
-    {
-      title: "The Science Behind Effective AI Prompting",
-      description: "Understanding how language models interpret and respond to prompts.",
-      category: "Research",
-      readTime: "8 min read"
-    },
-    {
-      title: "Prompt Templates for Marketing Professionals",
-      description: "Ready-to-use prompts for content creation and marketing campaigns.",
-      category: "Marketing",
-      readTime: "5 min read"
-    },
-    {
-      title: "Debugging AI Responses: Common Prompt Mistakes",
-      description: "Learn to identify and fix issues in your prompt structure.",
-      category: "Troubleshooting",
-      readTime: "6 min read"
-    },
-    {
-      title: "Building Custom Prompts for Technical Documentation",
-      description: "Create clear, comprehensive technical content with AI assistance.",
-      category: "Technical",
-      readTime: "7 min read"
-    },
-    {
-      title: "The Future of AI Prompt Engineering",
-      description: "Emerging trends and what to expect in the next generation of AI.",
-      category: "Future",
-      readTime: "9 min read"
-    },
-    {
-      title: "Cross-Platform Prompt Optimization Strategies",
-      description: "Make your prompts work across different AI models and platforms.",
-      category: "Strategy",
-      readTime: "6 min read"
-    },
-    {
-      title: "Ethical Considerations in AI Prompt Design",
-      description: "Best practices for responsible AI prompt creation and usage.",
-      category: "Ethics",
-      readTime: "5 min read"
-    },
-    {
-      title: "Measuring Prompt Performance and ROI",
-      description: "Track the effectiveness of your AI prompts with proven metrics.",
-      category: "Analytics",
-      readTime: "8 min read"
-    }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Header */}
-      <header className="border-b border-border/40 backdrop-blur-sm bg-background/80 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600">
-                <Zap className="h-6 w-6 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold gradient-text">promptt</h1>
-            </div>
-            <Button onClick={onGetStarted} className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-              Get Started
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </header>
-
+    <div>
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto text-center">
@@ -155,14 +81,16 @@ const LandingPage = ({ onGetStarted, onViewBlog, onViewPricing }: LandingPagePro
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button 
                 size="lg" 
-                onClick={onGetStarted}
+                asChild
                 className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-6"
               >
-                Start Generating
-                <Sparkles className="ml-2 h-5 w-5" />
+                <Link to="/auth">
+                  Start Generating
+                  <Sparkles className="ml-2 h-5 w-5" />
+                </Link>
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6" onClick={onGetStarted}>
-                Try Demo
+              <Button variant="outline" size="lg" className="text-lg px-8 py-6" asChild>
+                <Link to="/auth">Try Demo</Link>
               </Button>
             </div>
             
@@ -226,27 +154,34 @@ const LandingPage = ({ onGetStarted, onViewBlog, onViewPricing }: LandingPagePro
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogs.map((blog, index) => (
-              <Card key={index} className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
-                <CardHeader>
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge variant="secondary">{blog.category}</Badge>
-                    <span className="text-sm text-muted-foreground">{blog.readTime}</span>
-                  </div>
-                  <CardTitle className="text-lg group-hover:gradient-text transition-all duration-300">
-                    {blog.title}
-                  </CardTitle>
-                  <CardDescription className="line-clamp-3">
-                    {blog.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="ghost" className="p-0 h-auto font-semibold text-blue-500 hover:text-purple-600">
-                    Read More
-                    <ArrowRight className="ml-1 h-4 w-4" />
-                  </Button>
-                </CardContent>
+              <Card key={index} className="hover:shadow-lg transition-all duration-300 group">
+                <Link to={`/blog/${blog.slug}`} className="block h-full">
+                  <CardHeader>
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge variant="secondary">{blog.category}</Badge>
+                      <span className="text-sm text-muted-foreground">{blog.readTime}</span>
+                    </div>
+                    <CardTitle className="text-lg group-hover:gradient-text transition-all duration-300">
+                      {blog.title}
+                    </CardTitle>
+                    <CardDescription className="line-clamp-3">
+                      {blog.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <span className="font-semibold text-blue-500 hover:text-purple-600">
+                      Read More
+                      <ArrowRight className="ml-1 h-4 w-4 inline" />
+                    </span>
+                  </CardContent>
+                </Link>
               </Card>
             ))}
+          </div>
+           <div className="text-center mt-12">
+            <Button asChild variant="outline">
+              <Link to="/blog">View All Posts</Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -262,11 +197,13 @@ const LandingPage = ({ onGetStarted, onViewBlog, onViewPricing }: LandingPagePro
           </p>
           <Button 
             size="lg" 
-            onClick={onGetStarted}
+            asChild
             className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-6"
           >
-            Get Started for Free
-            <ArrowRight className="ml-2 h-5 w-5" />
+            <Link to="/auth">
+              Get Started for Free
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
           </Button>
         </div>
       </section>
@@ -290,30 +227,30 @@ const LandingPage = ({ onGetStarted, onViewBlog, onViewPricing }: LandingPagePro
             <div>
               <h3 className="font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">API</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Documentation</a></li>
+                <li><Link to="#" className="hover:text-foreground transition-colors">Features</Link></li>
+                <li><Link to="/pricing" className="hover:text-foreground transition-colors">Pricing</Link></li>
+                <li><Link to="#" className="hover:text-foreground transition-colors">API</Link></li>
+                <li><Link to="#" className="hover:text-foreground transition-colors">Documentation</Link></li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold mb-4">Resources</h3>
               <ul className="space-y-2 text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Tutorials</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Templates</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Community</a></li>
+                <li><Link to="/blog" className="hover:text-foreground transition-colors">Blog</Link></li>
+                <li><Link to="#" className="hover:text-foreground transition-colors">Tutorials</Link></li>
+                <li><Link to="#" className="hover:text-foreground transition-colors">Templates</Link></li>
+                <li><Link to="#" className="hover:text-foreground transition-colors">Community</Link></li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Terms</a></li>
+                <li><Link to="#" className="hover:text-foreground transition-colors">About</Link></li>
+                <li><Link to="#" className="hover:text-foreground transition-colors">Contact</Link></li>
+                <li><Link to="#" className="hover:text-foreground transition-colors">Privacy</Link></li>
+                <li><Link to="#" className="hover:text-foreground transition-colors">Terms</Link></li>
               </ul>
             </div>
           </div>
