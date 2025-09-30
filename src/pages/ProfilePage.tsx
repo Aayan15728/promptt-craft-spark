@@ -11,7 +11,7 @@ const ProfilePage = () => {
     return <div>Loading profile...</div>;
   }
 
-  return <Profile user={user} setCurrentView={() => navigate('/')} />;
+  return <Profile user={user} />;
 };
 
 export default ProfilePage;

@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Heart, Loader2, Sparkles, CheckCircle, Crown } from 'lucide-react';
+import { Copy, Heart, Loader2, Sparkles, CheckCircle, Crown, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface PromptGeneratorProps {
   user: User | null;
@@ -27,6 +28,9 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const [isCopied, setIsCopied] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [promptId, setPromptId] = useState<string | null>(null);
 
   const handleGenerate = async () => {
     if (!goal.trim()) {
@@ -38,108 +42,106 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
       return;
     }
 
-    // Check if user has daily uses left
     if (user && dailyUsesLeft <= 0) {
-      if (onUpgradeRequired) {
-        onUpgradeRequired();
-        return;
-      }
+      onUpgradeRequired?.();
+      return;
     }
 
     setLoading(true);
+    setGeneratedPrompt('');
+    setPromptId(null);
+    setIsFavorite(false);
 
     try {
       const { data, error } = await supabase.functions.invoke('generate-prompt', {
-        body: {
-          goal,
-          category: category || undefined,
-        },
+        body: { goal, category: category || undefined },
       });
 
-      if (error) {
-        throw new Error(error.message || 'Failed to call prompt generation function');
-      }
-
-      if (data?.error) {
-        throw new Error(data.error);
-      }
-
-      if (!data?.generatedPrompt) {
-        throw new Error('No prompt was generated. Please try again.');
-      }
+      if (error) throw new Error(error.message || 'Failed to call prompt generation function');
+      if (data?.error) throw new Error(data.error);
+      if (!data?.generatedPrompt) throw new Error('No prompt was generated. Please try again.');
 
       setGeneratedPrompt(data.generatedPrompt);
       
-      // Use daily limit if authenticated
-      if (user && onUseDailyLimit) {
-        onUseDailyLimit();
-      }
-      
-      // Save to database if user is authenticated
       if (user) {
-        await savePrompt(data.generatedPrompt);
+        onUseDailyLimit?.();
+        const newPromptId = await savePrompt(data.generatedPrompt);
+        setPromptId(newPromptId);
       }
       
       toast({
         title: "Success",
         description: user 
-          ? `Prompt generated successfully! ${dailyUsesLeft - 1} prompts remaining today.` 
-          : "Prompt generated! Sign up to save your prompts and get more daily uses!"
+          ? `Prompt generated! ${dailyUsesLeft - 1} prompts left today.`
+          : "Prompt generated! Sign up to save prompts and get more daily uses!"
       });
     } catch (error) {
-      console.error('Error generating prompt:', error);
       const errorMessage = error instanceof Error ? error.message : "Failed to generate prompt. Please try again.";
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive"
-      });
+      toast({ title: "Error", description: errorMessage, variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
 
-  const savePrompt = async (prompt: string) => {
-    if (!user) return;
+  const savePrompt = async (prompt: string): Promise<string | null> => {
+    if (!user) return null;
     
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('prompts')
         .insert({
           user_id: user.id,
           goal,
           generated_prompt: prompt,
-          category: category || null
-        });
+          category: category || null,
+          is_favorite: false,
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
+      return data?.id || null;
     } catch (error) {
       console.error('Error saving prompt:', error);
+      return null;
     }
   };
 
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(generatedPrompt);
-      toast({
-        title: "Copied!",
-        description: "Prompt copied to clipboard"
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to copy to clipboard",
-        variant: "destructive"
-      });
-    }
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(generatedPrompt);
+    setIsCopied(true);
+    toast({ title: "Copied!", description: "Prompt copied to clipboard" });
+    setTimeout(() => setIsCopied(false), 2000);
   };
 
   const toggleFavorite = async () => {
-    // This would require finding the prompt ID and updating it
-    toast({
-      title: "Feature coming soon",
-      description: "Favorites will be available in the next update"
-    });
+    if (!promptId || !user) {
+      toast({ title: "Note", description: "Save prompts by signing up!"});
+      return;
+    };
+
+    const newFavoriteStatus = !isFavorite;
+    setIsFavorite(newFavoriteStatus);
+
+    try {
+      const { error } = await supabase
+        .from('prompts')
+        .update({ is_favorite: newFavoriteStatus })
+        .eq('id', promptId)
+        .eq('user_id', user.id);
+
+      if (error) {
+        setIsFavorite(!newFavoriteStatus); // Revert on error
+        throw error;
+      }
+
+      toast({
+        title: newFavoriteStatus ? "Saved to Favorites" : "Removed from Favorites",
+        description: "You can find your favorite prompts in the History page.",
+      });
+    } catch (error) {
+      toast({ title: "Error", description: "Could not update favorite status.", variant: "destructive" });
+    }
   };
 
   return (
@@ -256,7 +258,22 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
       </Card>
 
       {/* Generated Result */}
-      {generatedPrompt && (
+      {loading && (
+        <Card className="shadow-xl">
+          <CardHeader>
+            <Skeleton className="h-8 w-48" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Skeleton className="h-32 w-full" />
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-6 w-24" />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {generatedPrompt && !loading && (
         <Card className="shadow-xl border-2 border-green-500/20 bg-gradient-to-r from-green-500/5 to-emerald-600/5">
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -273,16 +290,16 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
                   onClick={copyToClipboard}
                   className="hover:bg-green-500/10 hover:border-green-500/50"
                 >
-                  <Copy className="h-4 w-4 mr-2" />
-                  Copy
+                  {isCopied ? <Check className="h-4 w-4 mr-2 text-green-500" /> : <Copy className="h-4 w-4 mr-2" />}
+                  {isCopied ? 'Copied!' : 'Copy'}
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={toggleFavorite}
-                  className="hover:bg-red-500/10 hover:border-red-500/50"
+                  className={`hover:bg-red-500/10 hover:border-red-500/50 ${isFavorite ? 'text-red-500 border-red-500/50' : ''}`}
                 >
-                  <Heart className="h-4 w-4 mr-2" />
+                  <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
                   Save
                 </Button>
               </div>

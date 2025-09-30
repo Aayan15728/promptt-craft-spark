@@ -6,19 +6,21 @@ import { User, History, FileText, CreditCard, Crown, Settings, LogOut } from 'lu
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface ProfileProps {
   user: SupabaseUser;
-  setCurrentView: (view: 'generator' | 'history' | 'blog' | 'profile' | 'pricing' | 'not-available') => void;
 }
 
-const Profile = ({ user, setCurrentView }: ProfileProps) => {
+const Profile = ({ user }: ProfileProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      navigate('/');
     } catch (error) {
       toast({
         title: "Error",
@@ -33,21 +35,21 @@ const Profile = ({ user, setCurrentView }: ProfileProps) => {
       icon: History,
       title: "Prompt History",
       description: "View all your generated prompts",
-      action: () => setCurrentView('history'),
+      action: () => navigate('/history'),
       badge: "View All"
     },
     {
       icon: FileText,
       title: "My Prompts",
       description: "Manage your saved prompts",
-      action: () => setCurrentView('history'),
+      action: () => navigate('/history'),
       badge: "Manage"
     },
     {
       icon: CreditCard,
       title: "Subscription Plans",
       description: "Upgrade your account",
-      action: () => setCurrentView('pricing'),
+      action: () => navigate('/pricing'),
       badge: "Free Plan"
     }
   ];

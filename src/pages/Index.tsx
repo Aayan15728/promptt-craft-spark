@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
-  const { user, dailyUsesLeft, setDailyUsesLeft, apiKey, setApiKey } = useAuth();
+  const { user, dailyUsesLeft, setDailyUsesLeft } = useAuth();
   const navigate = useNavigate();
 
   if (!user) {
@@ -14,8 +14,6 @@ const Index = () => {
   return (
     <PromptGenerator
       user={user}
-      apiKey={apiKey}
-      setApiKey={setApiKey}
       dailyUsesLeft={dailyUsesLeft}
       onUseDailyLimit={() => setDailyUsesLeft(prev => Math.max(0, prev - 1))}
       onUpgradeRequired={() => navigate('/pricing')}
